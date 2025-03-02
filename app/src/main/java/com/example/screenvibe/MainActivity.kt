@@ -25,7 +25,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.screenvibe.data.models.MovieResponse
 import com.example.screenvibe.data.models.QueryParams
-import com.example.screenvibe.ui.screens.MovieScreen
+import com.example.screenvibe.ui.MoviesScreen
 import com.example.screenvibe.ui.theme.ScreenVibeTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -36,7 +36,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             ScreenVibeTheme {
-                    MovieScreen()
+                MoviesScreen()
             }
         }
     }

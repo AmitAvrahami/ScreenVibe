@@ -1,7 +1,7 @@
 package com.example.screenvibe.viewmodel
 
 import ConfigurationResponse
-import Movie
+import com.example.screenvibe.data.models.Movie
 import MovieDetailsResponse
 import Review
 import androidx.lifecycle.ViewModel
@@ -10,6 +10,8 @@ import com.example.screenvibe.data.models.*
 import com.example.screenvibe.data.repositories.MoviesRepository
 import com.example.screenvibe.utils.TmdbErrorHandler
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
@@ -41,6 +43,40 @@ class MoviesViewModel @Inject constructor(
     private val _errorMessage = MutableStateFlow<String?>(null)
     val errorMessage: StateFlow<String?> = _errorMessage.asStateFlow()
 
+    private var searchJob: Job? = null
+
+    fun searchMoviesDebounced(query: String) {
+        searchJob?.cancel()
+
+        searchJob = viewModelScope.launch {
+            delay(500)
+            searchMovies(query)
+        }
+    }
+
+    private  fun searchMovies(query: String) = viewModelScope.launch {
+        _isLoading.value = true
+        _errorMessage.value = null
+
+        val params = QueryParams.SearchMovie(query = query, page = 1)
+        repository.searchMovies(params)
+            .onSuccess { result ->
+                _movies.value = emptyList()
+                _movies.value = result.results
+            }
+            .onFailure {
+                _errorMessage.value = when (it) {
+                    is HttpException -> TmdbErrorHandler.getErrorMessage(it.code())
+                    else -> it.localizedMessage ?: "Unknown error occurred."
+                }
+            }
+
+        _isLoading.value = false
+    }
+
+    private var currentPage = 1
+    private var canLoadMore = true
+
     private fun <T> handleApiCall(
         apiCall: suspend () -> Result<T>,
         onSuccess: (T) -> Unit
@@ -64,14 +100,31 @@ class MoviesViewModel @Inject constructor(
         }
     }
 
-    fun discoverMovies(params: QueryParams.DiscoverMovie = QueryParams.DiscoverMovie()) {
-        handleApiCall({ repository.getMoviesByParams(params) }) { _movies.value = it.results }
+    fun discoverMovies(params: QueryParams.DiscoverMovie = QueryParams.DiscoverMovie(page = 1)) {
+        handleApiCall({ repository.getMoviesByParams(params) }) {
+            _movies.value = it.results
+            currentPage = 1
+            canLoadMore = it.results.isNotEmpty()
+        }
     }
 
-    fun searchMovies(query: String) {
-        val params = QueryParams.SearchMovie(query = query, page = 1)
-        handleApiCall({ repository.searchMovies(params) }) { _movies.value = it.results }
+    fun loadMoreMovies() {
+        if (!canLoadMore || _isLoading.value) return
+        val nextPage = currentPage + 1
+        val params = QueryParams.DiscoverMovie(page = nextPage)
+
+        handleApiCall({ repository.getMoviesByParams(params) }) { response ->
+            if (response.results.isNotEmpty()) {
+                _movies.value += response.results
+                currentPage = nextPage
+            } else {
+                canLoadMore = false
+            }
+        }
     }
+
+
+
 
     fun getMovieDetails(movieId: Int) {
         val params = QueryParams.MovieDetails(appendToResponse = "videos,credits")

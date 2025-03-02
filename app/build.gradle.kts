@@ -95,6 +95,9 @@ dependencies {
     implementation(libs.androidx.room.ktx)
     implementation(libs.accompanist.navigation.animation)
     implementation(libs.accompanist.systemuicontroller)
+    implementation(libs.androidx.foundation)
+    implementation(libs.coil.kt.coil.compose)
+
 
 
 }

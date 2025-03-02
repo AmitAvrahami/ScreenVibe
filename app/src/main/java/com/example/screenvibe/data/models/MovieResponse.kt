@@ -1,6 +1,5 @@
 package com.example.screenvibe.data.models
 
-import Movie
 import com.google.gson.annotations.SerializedName
 
 data class MovieResponse(

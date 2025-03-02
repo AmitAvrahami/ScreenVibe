@@ -23,13 +23,6 @@ class MoviesRepository @Inject constructor(
         return runCatching { apiService.searchMovies(params.toMap()) }
     }
 
-    suspend fun getMovieDetails(movieId: Int, params: QueryParams.MovieDetails): Result<MovieDetailsResponse> {
-        return runCatching { apiService.getMovieDetails(movieId, params.toMap()) }
-    }
-
-    suspend fun getMovieReviews(movieId: Int, params: QueryParams.MovieReviews): Result<ReviewResponse> {
-        return runCatching { apiService.getMovieReviews(movieId, params.toMap()) }
-    }
 
     suspend fun getGenres(params: QueryParams.Genres = QueryParams.Genres()): Result<GenresResponse> {
         return runCatching { apiService.getGenres(params.toMap()) }
@@ -38,5 +31,4 @@ class MoviesRepository @Inject constructor(
     suspend fun getConfiguration(): Result<ConfigurationResponse> {
         return runCatching { apiService.getConfiguration(QueryParams.Configuration.toMap()) }
     }
-    //TODO : IF TIME ADD MORE METHODS
 }

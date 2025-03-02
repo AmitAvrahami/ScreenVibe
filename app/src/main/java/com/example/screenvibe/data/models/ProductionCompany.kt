@@ -6,6 +6,4 @@ data class ProductionCompany(
     @SerializedName("logo_path") val logoPath: String?,
     @SerializedName("origin_country") val originCountry: String
 ) {
-    val logoFullPath: String
-        get() = logoPath?.let { "https://image.tmdb.org/t/p/w500$it" } ?: ""
 }

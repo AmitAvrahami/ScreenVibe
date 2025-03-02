@@ -1,4 +1,4 @@
-package com.example.screenvibe.viewmodel
+package com.example.screenvibe.ui.viewmodel
 
 import ConfigurationResponse
 import com.example.screenvibe.data.models.Movie
@@ -25,14 +25,11 @@ class MoviesViewModel @Inject constructor(
     private val _movies = MutableStateFlow<List<Movie>>(emptyList())
     val movies: StateFlow<List<Movie>> = _movies.asStateFlow()
 
-    private val _movieDetails = MutableStateFlow<MovieDetailsResponse?>(null)
-    val movieDetails: StateFlow<MovieDetailsResponse?> = _movieDetails.asStateFlow()
+    private var _selectedGenre = MutableStateFlow<Genre?>(null)
+    val selectedGenre = _selectedGenre.asStateFlow()
 
-    private val _movieReviews = MutableStateFlow<List<Review>>(emptyList())
-    val movieReviews: StateFlow<List<Review>> = _movieReviews.asStateFlow()
-
-    private val _genres = MutableStateFlow<List<Genre>>(emptyList())
-    val genres: StateFlow<List<Genre>> = _genres.asStateFlow()
+    private val _imageBaseUrl = MutableStateFlow<String?>(null)
+    private val imageBaseUrl: StateFlow<String?> = _imageBaseUrl.asStateFlow()
 
     private val _configuration = MutableStateFlow<ConfigurationResponse?>(null)
     val configuration: StateFlow<ConfigurationResponse?> = _configuration.asStateFlow()
@@ -43,7 +40,28 @@ class MoviesViewModel @Inject constructor(
     private val _errorMessage = MutableStateFlow<String?>(null)
     val errorMessage: StateFlow<String?> = _errorMessage.asStateFlow()
 
+    private val _genres = MutableStateFlow<List<Genre>>(emptyList())
+    val genres = flow {
+        repository.getGenres(QueryParams.Genres())
+            .onSuccess { emit(it.genres) }
+            .onFailure { _errorMessage.value = it.localizedMessage ?: "Error fetching genres" }
+    }
+        .onEach { loadedGenres ->
+            _genres.value = loadedGenres
+            if (_selectedGenre.value == null && loadedGenres.isNotEmpty()) {
+                _selectedGenre.value = loadedGenres.first()
+            }
+        }
+        .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
+
+    private var currentPage = 1
+    private var canLoadMore = true
+
     private var searchJob: Job? = null
+
+    init {
+        fetchImageConfiguration()
+    }
 
     fun searchMoviesDebounced(query: String) {
         searchJob?.cancel()
@@ -54,6 +72,10 @@ class MoviesViewModel @Inject constructor(
         }
     }
 
+    fun setSelectedGenre(genre: Genre) {
+        _selectedGenre.value = genre
+    }
+
     private  fun searchMovies(query: String) = viewModelScope.launch {
         _isLoading.value = true
         _errorMessage.value = null
@@ -62,7 +84,9 @@ class MoviesViewModel @Inject constructor(
         repository.searchMovies(params)
             .onSuccess { result ->
                 _movies.value = emptyList()
-                _movies.value = result.results
+                _movies.value = result.results.map { movie ->
+                    movie.copy(posterFullPath = imageBaseUrl.value?.let { "$it${movie.posterPath}" } ?: "")
+                }
             }
             .onFailure {
                 _errorMessage.value = when (it) {
@@ -74,8 +98,7 @@ class MoviesViewModel @Inject constructor(
         _isLoading.value = false
     }
 
-    private var currentPage = 1
-    private var canLoadMore = true
+
 
     private fun <T> handleApiCall(
         apiCall: suspend () -> Result<T>,
@@ -102,7 +125,9 @@ class MoviesViewModel @Inject constructor(
 
     fun discoverMovies(params: QueryParams.DiscoverMovie = QueryParams.DiscoverMovie(page = 1)) {
         handleApiCall({ repository.getMoviesByParams(params) }) {
-            _movies.value = it.results
+            _movies.value = it.results.map { movie ->
+                movie.copy(posterFullPath = imageBaseUrl.value?.let { "$it${movie.posterPath}" } ?: "")
+            }
             currentPage = 1
             canLoadMore = it.results.isNotEmpty()
         }
@@ -115,7 +140,9 @@ class MoviesViewModel @Inject constructor(
 
         handleApiCall({ repository.getMoviesByParams(params) }) { response ->
             if (response.results.isNotEmpty()) {
-                _movies.value += response.results
+                _movies.value += response.results.map { movie ->
+                    movie.copy(posterFullPath = imageBaseUrl.value?.let { "$it${movie.posterPath}" } ?: "")
+                }
                 currentPage = nextPage
             } else {
                 canLoadMore = false
@@ -123,25 +150,25 @@ class MoviesViewModel @Inject constructor(
         }
     }
 
-
-
-
-    fun getMovieDetails(movieId: Int) {
-        val params = QueryParams.MovieDetails(appendToResponse = "videos,credits")
-        handleApiCall({ repository.getMovieDetails(movieId, params) }) { _movieDetails.value = it }
+    private fun fetchImageConfiguration() {
+        viewModelScope.launch {
+            repository.getConfiguration()
+                .onSuccess { config ->
+                    val baseUrl = config.images.secureBaseUrl
+                    val size = config.images.posterSizes.find { it == "w500" } ?: "original"
+                    _imageBaseUrl.value = "$baseUrl$size/"
+                }
+                .onFailure {
+                    _errorMessage.value = it.localizedMessage ?: "Failed to fetch image configuration"
+                }
+        }
     }
 
-    fun getMovieReviews(movieId: Int) {
-        val params = QueryParams.MovieReviews(page = 1)
-        handleApiCall({ repository.getMovieReviews(movieId, params) }) { _movieReviews.value = it.reviews }
-    }
+
 
     fun getGenres() {
         val params = QueryParams.Genres()
         handleApiCall({ repository.getGenres(params) }) { _genres.value = it.genres }
     }
-
-    fun getConfiguration() {
-        handleApiCall({ repository.getConfiguration() }) { _configuration.value = it }
-    }
 }
+

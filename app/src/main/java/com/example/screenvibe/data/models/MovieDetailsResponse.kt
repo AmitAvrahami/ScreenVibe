@@ -29,9 +29,5 @@ data class MovieDetailsResponse(
     @SerializedName("production_countries") val productionCountries: List<ProductionCountry> = emptyList(),
     @SerializedName("spoken_languages") val spokenLanguages: List<SpokenLanguage> = emptyList()
 ) {
-    val posterFullPath: String
-        get() = posterPath?.let { "https://image.tmdb.org/t/p/w500$it" } ?: ""
 
-    val backdropFullPath: String
-        get() = backdropPath?.let { "https://image.tmdb.org/t/p/w780$it" } ?: ""
 }

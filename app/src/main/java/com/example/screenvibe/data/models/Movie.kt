@@ -16,11 +16,9 @@ data class Movie(
     @SerializedName("vote_count") val voteCount: Int = 0,
     @SerializedName("video") val hasVideo: Boolean = true,
     @SerializedName("adult") val isAdult: Boolean = true,
-    @SerializedName("genre_ids") val genreIds: List<Int> = emptyList()
-) {
-    val posterFullPath: String
-        get() = posterPath?.let { "https://image.tmdb.org/t/p/w500$it" } ?: "" //TODO : temp function
+    @SerializedName("genre_ids") val genreIds: List<Int> = emptyList(),
+    var posterFullPath: String? = null
 
-    val backdropFullPath: String
-        get() = backdropPath?.let { "https://image.tmdb.org/t/p/w780$it" } ?: "" //TODO : temp function
+) {
+
 }

@@ -13,28 +13,28 @@ import retrofit2.http.QueryMap
 
 interface TmdbApiService {
 
-    @GET("genre/movie/list")
+    @GET("/3/genre/movie/list")
     suspend fun getGenres(@QueryMap options: Map<String, String>): GenresResponse
 
-    @GET("discover/movie")
+    @GET("/3/discover/movie")
     suspend fun getMovies(@QueryMap options: Map<String, String>): MovieResponse
 
-    @GET("search/movie")
+    @GET("/3/search/movie")
     suspend fun searchMovies(@QueryMap options: Map<String, String>): MovieResponse
 
-    @GET("movie/{movie_id}")
+    @GET("/3/movie/{movie_id}")
     suspend fun getMovieDetails(
         @Path("movie_id") movieId: Int,
         @QueryMap options: Map<String, String>
     ): MovieDetailsResponse
 
-    @GET("movie/{movie_id}/reviews")
+    @GET("/3/movie/{movie_id}/reviews")
     suspend fun getMovieReviews(
         @Path("movie_id") movieId: Int,
         @QueryMap options: Map<String, String>
     ): ReviewResponse
 
-    @GET("configuration")
+    @GET("/3/configuration")
     suspend fun getConfiguration(
         @QueryMap options: Map<String, String>
     ): ConfigurationResponse

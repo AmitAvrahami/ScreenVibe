@@ -10,7 +10,6 @@ import com.example.screenvibe.data.models.QueryParams
 import jakarta.inject.Inject
 import jakarta.inject.Singleton
 
-@Singleton
 class MoviesRepository @Inject constructor(
     private val apiService: TmdbApiService
 ) {

@@ -40,6 +40,6 @@ ScreenVibe is a sleek and modern Android application that allows users to explor
 	3.	Sync the project and build it in Android Studio.
 	4.	Run the app on an emulator or physical device.
 
-![image](https://github.com/user-attachments/assets/a816f271-2178-4df4-bdd1-b9e0e93fbc1c)
+![Screenshot](https://github.com/user-attachments/assets/48a568e5-3841-4091-a187-38bcdce964b0)
 
-![image](https://github.com/user-attachments/assets/553f996b-e3a5-44a4-9345-93cab3b024ab)
+![Screenshot](https://github.com/user-attachments/assets/bba2f35b-5eed-4577-b1c4-7e0cf44ea91f)

@@ -40,27 +40,6 @@ ScreenVibe is a sleek and modern Android application that allows users to explor
 	3.	Sync the project and build it in Android Studio.
 	4.	Run the app on an emulator or physical device.
 
-## Project Structure:
-📂 screenvibe
- ┣ 📂 data
- ┃ ┣ 📂 api
- ┃ ┃ ┗ TmdbApiService.kt
- ┃ ┣ 📂 models
- ┃ ┃ ┣ Movie.kt
- ┃ ┃ ┣ Genre.kt
- ┃ ┃ ┗ QueryParams.kt
- ┃ ┣ 📂 repositories
- ┃ ┃ ┗ MoviesRepository.kt
- ┣ 📂 ui
- ┃ ┣ 📂 components
- ┃ ┃ ┣ GenreTabs.kt
- ┃ ┃ ┗ MovieCard.kt
- ┃ ┣ 📂 screens
- ┃ ┃ ┗ MoviesScreen.kt
- ┃ ┣ 📂 theme
- ┃ ┃ ┣ Theme.kt
- ┃ ┃ ┣ Color.kt
- ┃ ┃ ┗ Typography.kt
- ┣ 📂 viewmodel
- ┃ ┗ MoviesViewModel.kt
- ┗ 📄 MainActivity.kt
+![image](https://github.com/user-attachments/assets/a816f271-2178-4df4-bdd1-b9e0e93fbc1c)
+
+![image](https://github.com/user-attachments/assets/553f996b-e3a5-44a4-9345-93cab3b024ab)

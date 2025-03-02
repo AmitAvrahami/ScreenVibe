@@ -28,7 +28,7 @@ ScreenVibe is a sleek and modern Android application that allows users to explor
 ### Prerequisites
 - Android Studio **Giraffe | 2023.3.1** or newer  
 - Kotlin **1.8+**  
-- A **TMDB API Key** (Get yours [here](https://www.themoviedb.org/settings/api))  
+- A **TMDB API Key** (Get yours [here](https://www.themoviedb.org/signup)
 
 ### Installation
 1. Clone the repository:  
